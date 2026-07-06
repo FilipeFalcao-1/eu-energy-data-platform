@@ -1,0 +1,17 @@
+# Ignora Arquivos de configuração de ambiente e senhas
+.env
+
+# Ignora arquivos do sistema operacional - Lixo Local
+.DS_Store
+Thumbs.db
+.vscode
+*.pyc
+__pycache__/
+
+#Ignora Dados Regeneraveis/Pesados
+data/bronze/*
+data/silver/*
+data/gold/*
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
