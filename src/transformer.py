@@ -40,6 +40,27 @@ def clean_generation():
     gen.to_parquet(DATA_SILVER / "generation.parquet", index=False)
     print(f"Silver generation: {len(gen)} records saved")
 
+def clean_load():
+    """Bronze → Silver: clean and standardize load to hourly UTC."""
+    all_load = []
+
+    for country in COUNTRIES:
+        df = pd.read_parquet(DATA_BRONZE / f"load_{country}.parquet")
+        df.index = df.index.tz_convert("UTC")
+
+        # Flatten multi-level columns if needed
+        if isinstance(df.columns, pd.MultiIndex):
+            df = df.xs("Actual Load", axis=1, level=1, drop_level=True)
+
+        df_hourly = df.resample("1h").mean()
+        df_hourly["country"] = country
+        all_load.append(df_hourly)
+
+    load = pd.concat(all_load).reset_index()
+    load.columns = ["timestamp", "load_mw", "country"]
+    load.to_parquet(DATA_SILVER / "load.parquet", index=False)
+    print(f"Silver load: {len(load)} records saved")
+
 def build_gold():
     """Silver → Gold: build analytical indicators."""
     prices = pd.read_parquet(DATA_SILVER / "prices.parquet")
@@ -65,12 +86,28 @@ def build_gold():
     daily_gen = gen.groupby(["date", "country"])[gen_cols].sum().reset_index()
     daily_gen.to_parquet(DATA_GOLD / "daily_generation.parquet", index=False)
 
+    # --- Gold 4: Energy balance (generation vs load) ---
+    load = pd.read_parquet(DATA_SILVER / "load.parquet")
+    gen_total = gen.copy()
+    gen_total["total_gen_mw"] = gen_total[gen_cols].sum(axis=1)
+    gen_summary = gen_total.groupby(["date", "country"])["total_gen_mw"].mean().reset_index()
+
+    load["date"] = pd.to_datetime(load["timestamp"]).dt.date
+    load_daily = load.groupby(["date", "country"])["load_mw"].mean().reset_index()
+
+    balance = gen_summary.merge(load_daily, on=["date", "country"])
+    balance["balance_mw"] = balance["total_gen_mw"] - balance["load_mw"]
+    balance["status"] = balance["balance_mw"].apply(lambda x: "exporter" if x > 0 else "importer")
+    balance.to_parquet(DATA_GOLD / "energy_balance.parquet", index=False)
+
     print(f"Gold daily_prices: {len(daily_prices)} records")
     print(f"Gold price_spread: {len(spread)} records")
     print(f"Gold daily_generation: {len(daily_gen)} records")
+    print(f"Gold energy_balance: {len(balance)} records")
 
 if __name__ == "__main__":
     clean_prices()
     clean_generation()
+    clean_load()
     build_gold()
     print("Pipeline complete: bronze → silver → gold")
