@@ -1,49 +1,90 @@
+# European Energy Data Platform
 
-# European Energy Data Platform - A Data Engineering Project
+End-to-end data engineering project built on real European electricity market data — day-ahead prices, load (consumption), and generation mix.
 
-An end-to-end data engineering project built on real European electricity market data — day-ahead prices, load, and generation mix. The European energy sector is one of the largest employers of data engineers on the continent: the energy transition has turned utilities into data-driven organizations. All data comes from the ENTSO-E Transparency Platform — a public, official, and continuously updated source, accessed via REST API
+All data comes from the [ENTSO-E Transparency Platform](https://transparency.entsoe.eu) — a public, official, and continuously updated source, accessed via REST API.
+
+## Central Question
+
+**Is Portugal a net exporter or importer of electricity — and what drives it?**
+
+The pipeline answers this by comparing generation and consumption data across Portugal and Spain (the Iberian market — MIBEL), identifying price divergences and energy balance patterns.
+
+## Pipeline
+
+ENTSO-E API → Bronze (raw Parquet) → Silver (cleaned, hourly UTC) → Gold (indicators) → Streamlit
 
 
-## Source
+| Layer  | What happens                                                        |
+|--------|---------------------------------------------------------------------|
+| Bronze | Raw data saved as-is from the API. Immutable.                       |
+| Silver | Timezone normalized to UTC, resampled to 1h, countries unified.     |
+| Gold   | Daily prices, price spread PT vs ES, generation mix, energy balance.|
 
- - [ENTSOE DataBase](https://transparency.entsoe.eu)
+## Project Structure
 
-  ENTSO-E (European Network of Transmission System Operators for Electricity) is an association of 40 electricity transmission system operators (TSOs) across 36 European countries. It coordinates the continent's interconnected power grid to ensure secure electricity supplies, manage cross-border energy trading, and drive the transition toward carbon neutrality.
-
-## Project Architecture
-```
 eu-energy-data-platform/
 ├── data/
-│   ├── bronze/
-│   ├── silver/
-│   └── gold/
+│ ├── bronze/
+│ ├── silver/
+│ └── gold/
 ├── src/
+│ ├── config.py
+│ ├── extractor.py
+│ ├── transformer.py
+│ └── app.py
 ├── tests/
-├── docs/
+│ └── test_transformer.py
+├── .env.example
 ├── .gitignore
 ├── requirements.txt
 └── README.md
-```
 
 
 ## Tech Stack
 
-| Camada        | Technology.   |
-| ------------- |:-------------:|
-| Extraction    | entsoe-py/requests|
-| Processing    | Pandas→PySpark|
-| Storage       | Parquet (Delta Lake)    |
-| Orchestration      | Script-based→Airflow|
-| Visualization    | Power BI|
+| Layer         | Technology                      |
+|---------------|---------------------------------|
+| Extraction    | entsoe-py, requests             |
+| Processing    | Pandas                          |
+| Storage       | Parquet (medallion architecture) |
+| Visualization | Streamlit                       |
+| Testing       | pytest                          |
 
-## Running
+## How to Run
 
+```bash
+# 1. Clone and setup
+git clone https://github.com/FilipeFalcao-1/eu-energy-data-platform.git
+cd eu-energy-data-platform
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 2. Configure API token
+cp .env.example .env
+# Edit .env and add your ENTSO-E security token
+
+# 3. Run the pipeline
+python src/extractor.py
+python src/transformer.py
+
+# 4. Launch the dashboard
+streamlit run src/app.py
+
+# 5. Run tests
+pytest tests/ -v
 ```
-We'll put it here later
-```
 
+## Key Findings (October 2026)
 
-## Authors
+- Portugal is a **net importer** of electricity for most of the month
+- Prices between PT and ES converge ~93% of the time (MIBEL effect)
+- Price divergences occur during evening peak hours when Portuguese renewable generation drops
+- Spain's diversified generation mix (nuclear, gas, wind, solar) keeps its prices more stable
 
-- [@filipefalcao-1](https://www.github.com/FilipeFalcao-1)
-- [Linkedin_Profile](https://www.linkedin.com/in/filipe-falcao1/)
+## Author
+
+**Filipe Falcão** — Senior Data Analyst transitioning into Data Engineering.
+
+[LinkedIn](https://linkedin.com/in/filipe-falcao1) · [GitHub](https://github.com/FilipeFalcao-1)
