@@ -16,4 +16,7 @@ for country in COUNTRIES:
     gen = client.query_generation(country, start=start, end=end, psr_type=None)
     gen.to_parquet(DATA_BRONZE / f"generation_{country}.parquet")
 
-    print(f"{country}: prices and generation saved to bronze")
+    #Consumo
+    load = client.query_load(country, start=start, end=end)
+    load.to_parquet(DATA_BRONZE / f"load_{country}.parquet")
+    print(f"{country}: prices, generation and load saved to bronze")
