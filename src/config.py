@@ -16,6 +16,6 @@ DATA_GOLD = PROJECT_ROOT / "data" / "gold"
 # Countries
 COUNTRIES = ["PT", "ES"]
 
-# Period
+# Period (fixed for project delivery; in production, use dynamic dates for incremental ingestion)
 DEFAULT_START = "2026-10-01"
 DEFAULT_END = "2026-10-31"
