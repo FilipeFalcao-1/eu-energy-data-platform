@@ -22,7 +22,7 @@ ENTSO-E API → Bronze (raw Parquet) → Silver (cleaned, hourly UTC) → Gold (
 | Gold   | Daily prices, price spread PT vs ES, generation mix, energy balance.|
 
 ## Project Structure
-
+'''
 eu-energy-data-platform/
 ├── data/
 │ ├── bronze/
@@ -39,7 +39,7 @@ eu-energy-data-platform/
 ├── .gitignore
 ├── requirements.txt
 └── README.md
-
+'''
 
 ## Tech Stack
 
