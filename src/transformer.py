@@ -65,6 +65,7 @@ def build_gold():
     """Silver → Gold: build analytical indicators."""
     prices = pd.read_parquet(DATA_SILVER / "prices.parquet")
     gen = pd.read_parquet(DATA_SILVER / "generation.parquet")
+    load = pd.read_parquet(DATA_SILVER / "load.parquet")
 
     # --- Gold 1: Daily average price per country ---
     prices["date"] = pd.to_datetime(prices["timestamp"]).dt.date
@@ -72,11 +73,16 @@ def build_gold():
     daily_prices.columns = ["date", "country", "avg_price_mwh"]
     daily_prices.to_parquet(DATA_GOLD / "daily_prices.parquet", index=False)
 
-    # --- Gold 2: Price spread PT vs ES (MIBEL divergence) ---
+    # --- Gold 2: Price spread PT vs all others ---
     pt = prices[prices["country"] == "PT"].set_index("timestamp")["price_mwh"]
-    es = prices[prices["country"] == "ES"].set_index("timestamp")["price_mwh"]
-    spread = (pt - es).dropna().reset_index()
-    spread.columns = ["timestamp", "spread_pt_es"]
+    spreads = []
+    for country in [c for c in COUNTRIES if c != "PT"]:
+        other = prices[prices["country"] == country].set_index("timestamp")["price_mwh"]
+        diff = (pt - other).dropna().reset_index()
+        diff.columns = ["timestamp", "spread"]
+        diff["comparison"] = f"PT vs {country}"
+        spreads.append(diff)
+    spread = pd.concat(spreads)
     spread["date"] = pd.to_datetime(spread["timestamp"]).dt.date
     spread.to_parquet(DATA_GOLD / "price_spread.parquet", index=False)
 
@@ -87,7 +93,6 @@ def build_gold():
     daily_gen.to_parquet(DATA_GOLD / "daily_generation.parquet", index=False)
 
     # --- Gold 4: Energy balance (generation vs load) ---
-    load = pd.read_parquet(DATA_SILVER / "load.parquet")
     gen_total = gen.copy()
     gen_total["total_gen_mw"] = gen_total[gen_cols].sum(axis=1)
     gen_summary = gen_total.groupby(["date", "country"])["total_gen_mw"].mean().reset_index()

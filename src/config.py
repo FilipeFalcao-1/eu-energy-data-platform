@@ -13,9 +13,17 @@ DATA_BRONZE = PROJECT_ROOT / "data" / "bronze"
 DATA_SILVER = PROJECT_ROOT / "data" / "silver"
 DATA_GOLD = PROJECT_ROOT / "data" / "gold"
 
-# Countries
-COUNTRIES = ["PT", "ES"]
+# Countries for generation and load (ISO codes)
+COUNTRIES = ["PT", "ES", "FR", "DE", "NL"]
 
-# Period (fixed for project delivery; in production, use dynamic dates for incremental ingestion)
-DEFAULT_START = "2026-10-01"
+# Bidding zones for prices (some differ from ISO)
+PRICE_ZONES = {
+    "PT": "PT",
+    "ES": "ES",
+    "FR": "FR",
+    "DE": "DE_LU",
+    "NL": "NL",
+}
+# Period (3 years of data)
+DEFAULT_START = "2024-01-01"
 DEFAULT_END = "2026-10-31"
