@@ -1,5 +1,9 @@
 # European Energy Data Platform
 
+## Live Dashboard
+
+📊 **[Open Dashboard](https://eu-energy-data-platform-qlezaqdxwpme5ygdxdmitv.streamlit.app)**
+
 End-to-end data engineering project built on real European electricity market data — day-ahead prices, load (consumption), and generation mix.
 
 All data comes from the [ENTSO-E Transparency Platform](https://transparency.entsoe.eu) — a public, official, and continuously updated source, accessed via REST API.
