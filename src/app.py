@@ -27,7 +27,7 @@ def load_data():
 prices, spread, balance, generation = load_data()
 
 # --- Sidebar filters ---
-st.sidebar.image("https://transparency.entsoe.eu/images/logo.svg", width=180)
+st.sidebar.image("https://transparency.entsoe.eu/public/1.50.0/assets/logo.svg", width=180)
 st.sidebar.title("Filters")
 
 countries = sorted(prices["country"].unique())
