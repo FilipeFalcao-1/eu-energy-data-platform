@@ -80,12 +80,26 @@ streamlit run src/app.py
 pytest tests/ -v
 ```
 
-## Key Findings (October 2026)
 
-- Portugal is a **net importer** of electricity for most of the month
-- Prices between PT and ES converge ~93% of the time (MIBEL effect)
-- Price divergences occur during evening peak hours when Portuguese renewable generation drops
-- Spain's diversified generation mix (nuclear, gas, wind, solar) keeps its prices more stable
+## Key Findings (January 2024 — October 2026)
+
+### Portugal is becoming more dependent on energy imports
+Over the three-year period, Portugal's net import position has deepened. The country starts each year as a net exporter (Q1), but transitions to net importer earlier each year — by April 2026, Portugal was already importing consistently, whereas in 2024 this shift happened later in the year.
+
+### Seasonal pattern: hydro drives the first half, imports cover the second
+Portugal exports energy in Q1 when rainfall fills reservoirs (strong hydro generation) and wind output is high. From Q2 onward, reservoirs drop, wind decreases, and even with strong solar generation, domestic supply falls short. Air conditioning demand in summer worsens the gap.
+
+### Portugal's import dependency is comparable to Germany's
+Both countries show a structural importer pattern across the period. The Netherlands, while also an importer, has a stronger export participation. France stands out as a consistent exporter, powered by its nuclear fleet.
+
+### Prices are stabilizing, but imports keep growing
+Energy prices across all five countries show a downward trend from the 2022 crisis peaks. However, Portugal's import volumes have not decreased proportionally — suggesting that price stabilization has not translated into energy independence.
+
+### MIBEL convergence remains high (~93%)
+Portugal and Spain share the same price ~93% of the time, confirming the integrated Iberian market. Price divergences concentrate during evening peak hours (18:00–21:00) when Portuguese renewable generation drops and interconnection capacity becomes the bottleneck.
+
+### 1.5M+ records processed
+The pipeline processes over 1.5 million records across 5 countries (PT, ES, FR, DE, NL), 3 datasets (prices, generation, load), and 34 months — from a live REST API with authentication, rate limits, and timezone normalization.
 
 ## Author
 
